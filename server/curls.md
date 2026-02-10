@@ -136,6 +136,90 @@ curl "http://localhost:3000/products?title=Product&sortBy=totalPrice&sortOrder=a
 
 ---
 
+## 3. View Product Details
+
+### Get Single Product by ID
+```bash
+curl "http://localhost:3000/products/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+```
+
+---
+
+## 4. Update Product
+
+### Update All Editable Fields
+```bash
+curl -X PATCH http://localhost:3000/products/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Product Title",
+    "description": "Updated description",
+    "quantity": 10,
+    "totalPrice": 200.00,
+    "totalDiscount": 20.00
+  }'
+```
+
+### Update Only Title
+```bash
+curl -X PATCH http://localhost:3000/products/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Title Only"
+  }'
+```
+
+### Update Price and Discount
+```bash
+curl -X PATCH http://localhost:3000/products/a1b2c3d4-e5f6-7890-abcd-ef1234567890 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "totalPrice": 150.00,
+    "totalDiscount": 15.00
+  }'
+```
+
+---
+
+## 5. Soft Delete Product
+
+### Delete Product (Sets deletedAt timestamp)
+```bash
+curl -X DELETE http://localhost:3000/products/a1b2c3d4-e5f6-7890-abcd-ef1234567890
+```
+
+**Note:** Returns `204 No Content` on success
+
+---
+
+## 6. Restore Deleted Product
+
+### Restore a Soft-Deleted Product
+```bash
+curl -X PATCH http://localhost:3000/products/a1b2c3d4-e5f6-7890-abcd-ef1234567890/restore
+```
+
+---
+
+## 7. Restore All Deleted Products
+
+### Restore All Soft-Deleted Products (Bulk Operation)
+```bash
+curl -X POST http://localhost:3000/products/restore-all
+```
+
+**Response:**
+```json
+{
+  "message": "Successfully restored 5 product(s)",
+  "count": 5
+}
+```
+
+**Note:** If no deleted products exist, returns `count: 0`
+
+---
+
 ## Response Format
 
 ### Create Product Response
@@ -150,6 +234,38 @@ curl "http://localhost:3000/products?title=Product&sortBy=totalPrice&sortOrder=a
   "totalDiscount": 10,
   "createdAt": "2026-02-09T15:30:00.000Z",
   "updatedAt": "2026-02-09T15:30:00.000Z",
+  "deletedAt": null
+}
+```
+
+### View Product Details Response
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "orderId": 1,
+  "title": "Sample Product",
+  "description": "A sample product description",
+  "quantity": 5,
+  "totalPrice": 100,
+  "totalDiscount": 10,
+  "createdAt": "2026-02-09T15:30:00.000Z",
+  "updatedAt": "2026-02-09T15:30:00.000Z",
+  "deletedAt": null
+}
+```
+
+### Update Product Response
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "orderId": 1,
+  "title": "Updated Product Title",
+  "description": "Updated description",
+  "quantity": 10,
+  "totalPrice": 200,
+  "totalDiscount": 20,
+  "createdAt": "2026-02-09T15:30:00.000Z",
+  "updatedAt": "2026-02-10T14:30:00.000Z",
   "deletedAt": null
 }
 ```
@@ -191,6 +307,15 @@ curl "http://localhost:3000/products?title=Product&sortBy=totalPrice&sortOrder=a
 }
 ```
 
+### Not Found Error Response
+```json
+{
+  "message": "Product with ID a1b2c3d4-e5f6-7890-abcd-ef1234567890 not found",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+
 ---
 
 ## Available Sort Fields
@@ -205,3 +330,4 @@ curl "http://localhost:3000/products?title=Product&sortBy=totalPrice&sortOrder=a
 ## Sort Orders
 - `asc` - Ascending
 - `desc` - Descending (default)
+
