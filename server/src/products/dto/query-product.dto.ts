@@ -2,7 +2,7 @@ import { IsOptional, IsString, IsInt, Min, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class QueryProductDto {
-  // Filtering
+
   @IsOptional()
   @IsInt()
   @Type(() => Number)
@@ -12,7 +12,6 @@ export class QueryProductDto {
   @IsString()
   title?: string;
 
-  // Sorting
   @IsOptional()
   @IsIn(['id', 'title', 'quantity', 'totalPrice', 'totalDiscount', 'createdAt', 'updatedAt'])
   sortBy?: string = 'createdAt';
@@ -21,7 +20,6 @@ export class QueryProductDto {
   @IsIn(['asc', 'desc'])
   sortOrder?: 'asc' | 'desc' = 'desc';
 
-  // Pagination
   @IsOptional()
   @IsInt()
   @Min(1)

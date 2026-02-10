@@ -7,7 +7,7 @@ export class LoggerMiddleware implements NestMiddleware {
   private readonly isDevelopment = process.env.NODE_ENV !== 'production';
 
   use(req: Request, res: Response, next: NextFunction) {
-    // Only log in development mode
+
     if (!this.isDevelopment) {
       return next();
     }
@@ -17,7 +17,7 @@ export class LoggerMiddleware implements NestMiddleware {
     const ip = req.ip || req.socket.remoteAddress || 'Unknown';
     const startTime = Date.now();
 
-    // Log incoming request
+  
     this.logger.log(
       `\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
@@ -30,7 +30,7 @@ export class LoggerMiddleware implements NestMiddleware {
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
     );
 
-    // Capture response
+    
     const originalSend = res.send;
     let responseBody: any;
 
@@ -43,8 +43,7 @@ export class LoggerMiddleware implements NestMiddleware {
     res.on('finish', () => {
       const duration = Date.now() - startTime;
       const { statusCode } = res;
-      
-      // Determine status emoji and color context
+       
       let statusEmoji = '✅';
       let statusLabel = 'SUCCESS';
       if (statusCode >= 400 && statusCode < 500) {
@@ -58,13 +57,12 @@ export class LoggerMiddleware implements NestMiddleware {
         statusLabel = 'REDIRECT';
       }
 
-      // Parse response body for logging
       let parsedBody = '';
       try {
         if (responseBody) {
           const parsed = typeof responseBody === 'string' ? JSON.parse(responseBody) : responseBody;
           parsedBody = JSON.stringify(parsed, null, 2);
-          // Truncate if too long
+
           if (parsedBody.length > 1000) {
             parsedBody = parsedBody.substring(0, 1000) + '\n... [truncated]';
           }

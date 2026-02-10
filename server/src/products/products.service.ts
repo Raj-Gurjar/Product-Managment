@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service.js';
+import { PrismaService } from '../database/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { QueryProductDto } from './dto/query-product.dto';
 
@@ -23,17 +23,14 @@ export class ProductsService {
   async findAll(query: QueryProductDto) {
     const { orderId, title, sortBy = 'createdAt', sortOrder = 'desc', page = 1, limit = 10 } = query;
 
-    // Build where clause - only show active items (deletedAt = null)
     const where: any = {
       deletedAt: null,
     };
 
-    // Filter by orderId if provided
     if (orderId) {
       where.orderId = orderId;
     }
 
-    // Filter by title (partial match, case-insensitive)
     if (title) {
       where.title = {
         contains: title,
