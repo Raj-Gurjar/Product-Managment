@@ -180,7 +180,6 @@ export const ProductsPage: React.FC = () => {
           <ProductTable
             products={data?.data || []}
             onDelete={handleDelete}
-            isDeleting={deleteMutation.isPending}
           />
         )}
       </Card>

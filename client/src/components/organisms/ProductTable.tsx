@@ -8,10 +8,9 @@ import { formatDate, formatCurrency, shortId } from '../../utils';
 interface ProductTableProps {
   products: Product[];
   onDelete: (id: string) => void;
-  isDeleting?: boolean;
 }
 
-export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete, isDeleting }) => {
+export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
   const navigate = useNavigate();
 
   const handleRowClick = (productId: string) => {
