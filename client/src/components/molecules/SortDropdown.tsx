@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown, Check } from 'lucide-react';
-import type { ProductQueryParams } from '../../types/product';
 
 interface SortDropdownProps {
   sortBy: string;
@@ -47,7 +46,7 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
       >
         <ArrowUpDown className="w-4 h-4 text-gray-600" />
         <span className="text-sm font-medium text-gray-700">
@@ -72,7 +71,7 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
                 onSortChange(option.value, sortOrder);
                 setIsOpen(false);
               }}
-              className={`w-full px-4 py-2 text-left text-sm flex items-center justify-between transition-colors ${
+              className={`w-full px-4 py-2 text-left text-sm flex items-center justify-between transition-colors cursor-pointer ${
                 sortBy === option.value
                   ? 'bg-blue-50 text-blue-700'
                   : 'text-gray-700 hover:bg-gray-50'
@@ -91,7 +90,7 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
                   onSortChange(sortBy, 'asc');
                   setIsOpen(false);
                 }}
-                className={`flex-1 px-3 py-2 text-sm rounded-md flex items-center justify-center gap-2 transition-colors ${
+                className={`flex-1 px-3 py-2 text-sm rounded-md flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                   sortOrder === 'asc'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -105,7 +104,7 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
                   onSortChange(sortBy, 'desc');
                   setIsOpen(false);
                 }}
-                className={`flex-1 px-3 py-2 text-sm rounded-md flex items-center justify-center gap-2 transition-colors ${
+                className={`flex-1 px-3 py-2 text-sm rounded-md flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                   sortOrder === 'desc'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

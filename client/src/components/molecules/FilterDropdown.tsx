@@ -38,7 +38,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
+        className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors cursor-pointer ${
           hasActiveFilters
             ? 'bg-blue-50 border-blue-300 text-blue-700'
             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -65,7 +65,7 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
                   onClearFilters();
                   setIsOpen(false);
                 }}
-                className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 cursor-pointer"
               >
                 <X className="w-3 h-3" />
                 Clear All
