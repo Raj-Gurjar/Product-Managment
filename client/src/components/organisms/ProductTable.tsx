@@ -8,13 +8,16 @@ import { formatDate, formatCurrency, shortId } from '../../utils';
 interface ProductTableProps {
   products: Product[];
   onDelete: (id: string) => void;
+  onRowClick?: (product: Product) => void;
 }
 
-export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
+export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete, onRowClick }) => {
   const navigate = useNavigate();
 
-  const handleRowClick = (productId: string) => {
-    navigate(`/products/${productId}`);
+  const handleRowClick = (product: Product) => {
+    if (onRowClick) {
+      onRowClick(product);
+    }
   };
 
   return (
@@ -55,7 +58,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }
           {products.map((product) => (
             <tr 
               key={product.id} 
-              onClick={() => handleRowClick(product.id)}
+              onClick={() => handleRowClick(product)}
               className="hover:bg-gray-50 cursor-pointer transition-colors"
             >
               <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">
@@ -90,7 +93,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }
                     {
                       label: 'View Details',
                       icon: <Eye className="w-4 h-4" />,
-                      onClick: () => navigate(`/products/${product.id}`),
+                      onClick: () => handleRowClick(product),
                     },
                     {
                       label: 'Edit',

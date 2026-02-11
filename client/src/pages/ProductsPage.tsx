@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Plus, RotateCcw } from 'lucide-react';
-import { useProducts, useDeleteProduct, useRestoreAllProducts } from '../hooks/useProducts';
+import { useProducts, useDeleteProduct, useRestoreAllProducts, useUpdateProduct, useCreateProduct } from '../hooks/useProducts';
 import { useDebounce } from '../hooks/useDebounce';
 import { ProductTable } from '../components/organisms/ProductTable';
+import { ProductDetail } from '../components/organisms/ProductDetail';
+import { ProductForm } from '../components/molecules/ProductForm';
 import { SearchBar } from '../components/molecules/SearchBar';
 import { SortDropdown } from '../components/molecules/SortDropdown';
 import { FilterDropdown } from '../components/molecules/FilterDropdown';
-import { Button, Card } from '../components/atoms';
-import type { ProductQueryParams } from '../types/product';
+import { Button, Card, Modal } from '../components/atoms';
+import type { ProductQueryParams, Product } from '../types/product';
 
 export const ProductsPage: React.FC = () => {
-  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const limit = 10;
 
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [filters, setFilters] = useState<ProductQueryParams>({
     sortBy: 'createdAt',
     sortOrder: 'desc',
@@ -23,11 +26,16 @@ export const ProductsPage: React.FC = () => {
   const { data, isLoading, error } = useProducts({ ...filters, page, limit });
   const deleteMutation = useDeleteProduct();
   const restoreAllMutation = useRestoreAllProducts();
+  const updateMutation = useUpdateProduct();
+  const createMutation = useCreateProduct();
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await deleteMutation.mutateAsync(id);
+        if (selectedProduct?.id === id) {
+          setSelectedProduct(null);
+        }
       } catch (error) {
         console.error('Failed to delete product:', error);
         alert('Failed to delete product. Please try again.');
@@ -94,6 +102,35 @@ export const ProductsPage: React.FC = () => {
 
   const hasActiveFilters = filters.orderId !== undefined;
 
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsEditing(false);
+  };
+  
+  const handleUpdateProduct = async (formData: any) => {
+    if (!selectedProduct) return;
+    try {
+      // Strip orderId as it's not allowed in the Update DTO (whitelisted)
+      const { orderId, ...updateData } = formData;
+      await updateMutation.mutateAsync({ id: selectedProduct.id, data: updateData });
+      setIsEditing(false);
+      setSelectedProduct(null); // Close modal on success
+    } catch (error) {
+      console.error('Failed to update product:', error);
+      alert('Failed to update product. Please try again.');
+    }
+  };
+
+  const handleCreateProduct = async (data: any) => {
+    try {
+      await createMutation.mutateAsync(data);
+      setIsCreating(false);
+    } catch (error) {
+      console.error('Failed to create product:', error);
+      alert('Failed to create product. Please try again.');
+    }
+  };
+
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -127,7 +164,7 @@ export const ProductsPage: React.FC = () => {
             <RotateCcw className="w-4 h-4" />
             Restore All
           </Button>
-          <Button onClick={() => navigate('/products/new')}>
+          <Button onClick={() => setIsCreating(true)}>
             <Plus className="w-4 h-4" />
             Create Product
           </Button>
@@ -185,6 +222,7 @@ export const ProductsPage: React.FC = () => {
           <ProductTable
             products={data?.data || []}
             onDelete={handleDelete}
+            onRowClick={handleProductClick}
           />
         )}
       </Card>
@@ -213,6 +251,54 @@ export const ProductsPage: React.FC = () => {
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Product Create/Edit/Detail Modal */}
+      {(selectedProduct || isCreating) && (
+        <Modal
+          isOpen={!!selectedProduct || isCreating}
+          onClose={() => {
+            setSelectedProduct(null);
+            setIsEditing(false);
+            setIsCreating(false);
+          }}
+          title={isCreating ? 'Create Product' : isEditing ? 'Edit Product' : 'Product Details'}
+        >
+          {isCreating ? (
+            <ProductForm
+              key="create"
+              onSubmit={handleCreateProduct}
+              isLoading={createMutation.isPending}
+              submitLabel="Create Product"
+              onCancel={() => setIsCreating(false)}
+            />
+          ) : selectedProduct ? (
+            isEditing ? (
+              <ProductForm
+                key={selectedProduct.id}
+                initialData={{
+                  ...selectedProduct,
+                  description: selectedProduct.description ?? undefined
+                } as any}
+                onSubmit={handleUpdateProduct}
+                isLoading={updateMutation.isPending}
+                submitLabel="Update Product"
+                onCancel={() => setIsEditing(false)}
+                onDelete={() => handleDelete(selectedProduct.id)}
+                isDeleting={deleteMutation.isPending}
+                isEdit={true}
+              />
+            ) : (
+              <ProductDetail
+                product={selectedProduct}
+                onDelete={() => handleDelete(selectedProduct.id)}
+                isDeleting={deleteMutation.isPending}
+                onBack={() => setSelectedProduct(null)}
+                onEdit={() => setIsEditing(true)}
+              />
+            )
+          ) : null}
+        </Modal>
       )}
     </div>
   );

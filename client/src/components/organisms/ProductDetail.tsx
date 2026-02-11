@@ -9,9 +9,11 @@ interface ProductDetailProps {
   product: Product;
   onDelete: () => void;
   isDeleting?: boolean;
+  onBack?: () => void;
+  onEdit?: () => void;
 }
 
-export const ProductDetail: React.FC<ProductDetailProps> = ({ product, onDelete, isDeleting }) => {
+export const ProductDetail: React.FC<ProductDetailProps> = ({ product, onDelete, isDeleting, onBack, onEdit }) => {
   const navigate = useNavigate();
 
   return (
@@ -22,7 +24,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, onDelete,
           <p className="mt-1 text-sm text-gray-500">Product ID: {product.id}</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={() => navigate(`/products/${product.id}/edit`)}>
+          <Button variant="secondary" onClick={onEdit ? onEdit : () => navigate(`/products/${product.id}/edit`)}>
             <Edit className="w-4 h-4" />
             Edit Product
           </Button>
@@ -85,12 +87,14 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, onDelete,
         </dl>
       </Card>
 
-      <div>
-        <Button variant="ghost" onClick={() => navigate('/products')}>
-          <ArrowLeft className="w-4 h-4" />
-          Back to Products
-        </Button>
-      </div>
+      {onBack && (
+        <div>
+          <Button variant="ghost" onClick={onBack}>
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

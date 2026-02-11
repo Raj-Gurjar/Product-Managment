@@ -3,9 +3,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { ProductsPage } from './pages/ProductsPage';
-import { CreateProductPage } from './pages/CreateProductPage';
-import { ProductDetailPage } from './pages/ProductDetailPage';
-import { EditProductPage } from './pages/EditProductPage';
 import './index.css';
 
 const App = () => {
@@ -38,9 +35,6 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Navigate to="/products" replace />} />
               <Route path="/products" element={<ProductsPage />} />
-              <Route path="/products/new" element={<CreateProductPage />} />
-              <Route path="/products/:id" element={<ProductDetailPage />} />
-              <Route path="/products/:id/edit" element={<EditProductPage />} />
             </Routes>
           </main>
         </div>
