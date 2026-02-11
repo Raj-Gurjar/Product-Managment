@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, RotateCcw } from 'lucide-react';
 import { useProducts, useDeleteProduct, useRestoreAllProducts } from '../hooks/useProducts';
+import { useDebounce } from '../hooks/useDebounce';
 import { ProductTable } from '../components/organisms/ProductTable';
 import { SearchBar } from '../components/molecules/SearchBar';
 import { SortDropdown } from '../components/molecules/SortDropdown';
@@ -46,20 +47,24 @@ export const ProductsPage: React.FC = () => {
     }
   };
 
-  const handleSearchChange = (searchValue: string) => {
-    setFilters({
-      ...filters,
-      title: searchValue || undefined,
-    });
+  const [searchTerm, setSearchTerm] = useState(filters.title || '');
+  const debouncedSearchTerm = useDebounce(searchTerm, 700);
+
+  // Sync debounced search term with filters
+  React.useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      title: debouncedSearchTerm || undefined,
+    }));
     setPage(1);
+  }, [debouncedSearchTerm]);
+
+  const handleSearchChange = (searchValue: string) => {
+    setSearchTerm(searchValue);
   };
 
   const handleClearSearch = () => {
-    setFilters({
-      ...filters,
-      title: undefined,
-    });
-    setPage(1);
+    setSearchTerm('');
   };
 
   const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
@@ -133,7 +138,7 @@ export const ProductsPage: React.FC = () => {
       <div className="mb-6 flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <SearchBar
-            value={filters.title || ''}
+            value={searchTerm}
             onChange={handleSearchChange}
             onClear={handleClearSearch}
             placeholder="Search products by title..."

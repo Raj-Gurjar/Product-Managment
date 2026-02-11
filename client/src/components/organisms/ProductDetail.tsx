@@ -16,7 +16,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, onDelete,
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
@@ -34,7 +33,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, onDelete,
         </div>
       </div>
 
-      {/* Main Details */}
       <Card>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Information</h2>
         <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
@@ -63,7 +61,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, onDelete,
         </dl>
       </Card>
 
-      {/* Audit Metadata */}
       <Card>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Audit Information</h2>
         <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
@@ -88,7 +85,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({ product, onDelete,
         </dl>
       </Card>
 
-      {/* Back Button */}
       <div>
         <Button variant="ghost" onClick={() => navigate('/products')}>
           <ArrowLeft className="w-4 h-4" />
