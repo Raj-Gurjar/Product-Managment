@@ -38,7 +38,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 overflow-y-auto w-full h-full" onClick={handleBackdropClick}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 overflow-y-auto w-full h-full" onClick={handleBackdropClick}>
       <div 
         ref={modalRef}
         className="relative bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col"
@@ -49,7 +49,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
           <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-500 focus:outline-none transition-colors"
+            className="text-gray-400 hover:text-gray-500 focus:outline-none transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="w-6 h-6" />
