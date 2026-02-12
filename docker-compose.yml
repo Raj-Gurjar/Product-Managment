@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password!123
+      POSTGRES_DB: products
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: nestjs_api
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:password!123@db:5432/products?schema=public
+      PORT: 3000
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    # Run migrations before starting the app
+    command: sh -c "npx prisma db push && npm run start:prod"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: react_client
+    depends_on:
+      - server
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data:
