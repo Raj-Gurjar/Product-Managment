@@ -1,18 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Eye, Edit, Trash2 } from 'lucide-react';
 import type { Product } from '../../types/product';
-import { DropdownMenu } from '../molecules/DropdownMenu';
 import { formatDate, formatCurrency, shortId } from '../../utils';
 
 interface ProductTableProps {
   products: Product[];
-  onDelete: (id: string) => void;
   onRowClick?: (product: Product) => void;
 }
 
-export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete, onRowClick }) => {
-  const navigate = useNavigate();
+export const ProductTable: React.FC<ProductTableProps> = ({ products, onRowClick }) => {
 
   const handleRowClick = (product: Product) => {
     if (onRowClick) {
@@ -49,9 +44,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete, 
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Created At
             </th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
+
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -87,28 +80,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete, 
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {formatDate(product.createdAt)}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <DropdownMenu
-                  items={[
-                    {
-                      label: 'View Details',
-                      icon: <Eye className="w-4 h-4" />,
-                      onClick: () => handleRowClick(product),
-                    },
-                    {
-                      label: 'Edit',
-                      icon: <Edit className="w-4 h-4" />,
-                      onClick: () => navigate(`/products/${product.id}/edit`),
-                    },
-                    {
-                      label: 'Delete',
-                      icon: <Trash2 className="w-4 h-4" />,
-                      variant: 'danger',
-                      onClick: () => onDelete(product.id),
-                    },
-                  ]}
-                />
-              </td>
+
             </tr>
           ))}
         </tbody>

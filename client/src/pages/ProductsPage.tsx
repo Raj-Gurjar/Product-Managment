@@ -221,7 +221,6 @@ export const ProductsPage: React.FC = () => {
         ) : (
           <ProductTable
             products={data?.data || []}
-            onDelete={handleDelete}
             onRowClick={handleProductClick}
           />
         )}

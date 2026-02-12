@@ -26,11 +26,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   isDeleting = false,
   isEdit = false,
 }) => {
-  const [unitPrice, setUnitPrice] = useState<number>(() => {
+  const [unitPrice, setUnitPrice] = useState<number | string>(() => {
     if (initialData?.totalPrice && initialData?.quantity) {
       return initialData.totalPrice / initialData.quantity;
     }
-    return 0;
+    return '';
   });
 
   const {
@@ -48,14 +48,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   // Update total price when quantity or unit price changes
   useEffect(() => {
-    if (quantity && unitPrice) {
-      const total = Number((quantity * unitPrice).toFixed(2));
+    const price = typeof unitPrice === 'string' ? parseFloat(unitPrice) : unitPrice;
+    if (quantity && !isNaN(price)) {
+      const total = Number((quantity * price).toFixed(2));
       setValue('totalPrice', total, { shouldValidate: true });
     }
   }, [quantity, unitPrice, setValue]);
 
   const handleUnitPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value) || 0;
+    const value = e.target.value;
     setUnitPrice(value);
   };
 
