@@ -24,7 +24,6 @@ services:
       NODE_ENV: production
     ports:
       - "3000:3000"
-    # Run migrations before starting the app
     command: sh -c "npx prisma db push && npm run start:prod"
 
   client:
@@ -35,7 +34,8 @@ services:
     depends_on:
       - server
     ports:
-      - "80:80"
+      - "5173:3001" 
+
 
 volumes:
   postgres_data:
