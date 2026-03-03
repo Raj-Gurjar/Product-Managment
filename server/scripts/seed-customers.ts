@@ -9,10 +9,6 @@ async function generateCSV() {
   console.log(`Generating ${COUNT} customers...`);
   const writeStream = fs.createWriteStream(FILE_PATH);
   
-  // Headers match the Customer table columns in Postgres
-  // Table name in Prisma might be camelCase or snake_case depending on configuration
-  // By default Prisma names the table "Customer" (case-sensitive)
-  // Columns: id, userId, phoneNumber, createdAt, updatedAt, deletedAt
   writeStream.write('id,userId,phoneNumber,createdAt,updatedAt,deletedAt\n');
 
   for (let i = 0; i < COUNT; i++) {
@@ -21,7 +17,7 @@ async function generateCSV() {
     const phoneNumber = faker.phone.number();
     const createdAt = new Date().toISOString();
     const updatedAt = new Date().toISOString();
-    const deletedAt = ''; // null for active customers
+    const deletedAt = '';
 
     const row = `${id},${userId},${phoneNumber},${createdAt},${updatedAt},${deletedAt}\n`;
     
