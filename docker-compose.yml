@@ -25,6 +25,11 @@ services:
       NODE_ENV: production
     ports:
       - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1024M
     command: sh -c "npx prisma db push && npm run start:prod"
 
   client:

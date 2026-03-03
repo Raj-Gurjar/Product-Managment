@@ -2,6 +2,7 @@ import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './database/prisma.module';
 import { ProductsModule } from './products/products.module';
+import { CustomersModule } from './customers/customers.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
@@ -12,6 +13,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
     }),
     PrismaModule,
     ProductsModule,
+    CustomersModule,
   ],
   controllers: [],
   providers: [],

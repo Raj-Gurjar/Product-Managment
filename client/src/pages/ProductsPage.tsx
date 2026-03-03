@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, RotateCcw } from 'lucide-react';
+import { Plus, RotateCcw, Download } from 'lucide-react';
 import { useProducts, useDeleteProduct, useRestoreAllProducts, useUpdateProduct, useCreateProduct } from '../hooks/useProducts';
 import { useDebounce } from '../hooks/useDebounce';
 import { ProductTable } from '../components/organisms/ProductTable';
@@ -156,6 +156,16 @@ export const ProductsPage: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-3">
+          <Button 
+            variant="secondary" 
+            onClick={() => {
+              const exportUrl = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'}/customers/export`;
+              window.open(exportUrl, '_blank');
+            }}
+          >
+            <Download className="w-4 h-4" />
+            Export Customers
+          </Button>
           <Button 
             variant="secondary" 
             onClick={handleRestoreAll}
