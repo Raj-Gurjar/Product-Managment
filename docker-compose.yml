@@ -10,6 +10,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./server/customers.csv:/var/lib/postgresql/data/customers.csv
 
   server:
     build:
@@ -34,8 +35,7 @@ services:
     depends_on:
       - server
     ports:
-      - "5173:3001" 
-
+      - "5173:3001"
 
 volumes:
   postgres_data:
