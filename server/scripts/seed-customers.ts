@@ -17,7 +17,7 @@ async function generateCSV() {
     const phoneNumber = faker.phone.number();
     const createdAt = new Date().toISOString();
     const updatedAt = new Date().toISOString();
-    const deletedAt = '';
+    const deletedAt = 'null';
 
     const row = `${id},${userId},${phoneNumber},${createdAt},${updatedAt},${deletedAt}\n`;
     

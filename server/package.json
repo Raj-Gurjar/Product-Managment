@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed:csv": "npx ts-node --transpile-only scripts/seed-customers.ts",
-    "seed:db": "docker exec -it postgres_db psql -U postgres -d products -c \"COPY \\\"Customer\\\"(id, \\\"userId\\\", \\\"phoneNumber\\\", \\\"createdAt\\\", \\\"updatedAt\\\", \\\"deletedAt\\\") FROM '/var/lib/postgresql/data/customers.csv' DELIMITER ',' CSV HEADER NULL AS '';\""
+    "seed:db": "docker exec -it postgres_db psql -U postgres -d products -c \"COPY \\\"Customer\\\"(id, \\\"userId\\\", \\\"phoneNumber\\\", \\\"createdAt\\\", \\\"updatedAt\\\", \\\"deletedAt\\\") FROM '/var/lib/postgresql/data/customers.csv' DELIMITER ',' CSV HEADER NULL AS 'null';\""
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
