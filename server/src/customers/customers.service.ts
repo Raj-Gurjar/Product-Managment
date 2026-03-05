@@ -11,13 +11,16 @@ export class CustomersService implements OnModuleDestroy {
 
   constructor(private configService: ConfigService) {
     const connectionString = this.configService.get<string>('DATABASE_URL');
+
     this.pool = new Pool({
       connectionString,
-      max: 5,
+      max: 2, // keep small for low resource usage
     });
   }
 
   async exportToExcel(res: Response) {
+    res.flushHeaders(); // start streaming early
+
     const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({
       stream: res,
       useStyles: false,
@@ -27,18 +30,24 @@ export class CustomersService implements OnModuleDestroy {
     const worksheet = workbook.addWorksheet('Customers');
 
     worksheet.columns = [
-      { header: 'ID', key: 'id', width: 40 },
-      { header: 'User ID', key: 'userId', width: 40 },
-      { header: 'Phone Number', key: 'phoneNumber', width: 25 },
-      { header: 'Created At', key: 'createdAt', width: 30 },
-      { header: 'Updated At', key: 'updatedAt', width: 30 },
+      { header: 'ID', key: 'id'},
+      { header: 'User ID', key: 'userId'},
+      { header: 'Phone Number', key: 'phoneNumber'},
+      { header: 'Created At', key: 'createdAt'},
+      { header: 'Updated At', key: 'updatedAt'},
     ];
 
     let client: PoolClient | undefined;
+
     try {
       client = await this.pool.connect();
-      
-      const query = new QueryStream('SELECT id, "userId", "phoneNumber", "createdAt", "updatedAt" FROM "Customer" ORDER BY id ASC');
+
+      const query = new QueryStream(
+        'SELECT id, "userId", "phoneNumber", "createdAt", "updatedAt" FROM "Customer"',
+        [],
+        { batchSize: 5000 }
+      );
+
       const stream = client.query(query);
 
       for await (const row of stream) {
@@ -46,8 +55,8 @@ export class CustomersService implements OnModuleDestroy {
           id: row.id,
           userId: row.userId,
           phoneNumber: row.phoneNumber,
-          createdAt: row.createdAt.toISOString(),
-          updatedAt: row.updatedAt.toISOString(),
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
         }).commit();
       }
 
@@ -55,6 +64,7 @@ export class CustomersService implements OnModuleDestroy {
       await workbook.commit();
     } catch (error) {
       console.error('Export failed:', error);
+
       if (!res.headersSent) {
         res.status(500).send('Export failed');
       }
