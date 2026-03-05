@@ -10,7 +10,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./server/customers.csv:/var/lib/postgresql/data/customers.csv
+      - ./server/customers.csv:/customers.csv
 
   server:
     build:
