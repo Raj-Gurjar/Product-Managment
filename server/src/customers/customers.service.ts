@@ -1,79 +1,61 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import * as ExcelJS from 'exceljs';
+import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
-import { Pool, PoolClient } from 'pg';
-import QueryStream from 'pg-query-stream';
+import { Pool } from 'pg';
+import Cursor from 'pg-cursor';
+import { stringify } from 'csv-stringify';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class CustomersService implements OnModuleDestroy {
+export class CustomersService {
   private pool: Pool;
 
-  constructor(private configService: ConfigService) {
-    const connectionString = this.configService.get<string>('DATABASE_URL');
-
+  constructor(private config: ConfigService) {
     this.pool = new Pool({
-      connectionString,
-      max: 2, // keep small for low resource usage
+      connectionString: this.config.get('DATABASE_URL'),
+      max: 2,
     });
   }
 
-  async exportToExcel(res: Response) {
-    res.flushHeaders(); // start streaming early
+  async exportCSV(res: Response) {
+    const client = await this.pool.connect();
 
-    const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({
-      stream: res,
-      useStyles: false,
-      useSharedStrings: false,
-    });
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition','attachment; filename=customers.csv');
 
-    const worksheet = workbook.addWorksheet('Customers');
+    const csv = stringify({ header: true });
+    csv.pipe(res);
 
-    worksheet.columns = [
-      { header: 'ID', key: 'id'},
-      { header: 'User ID', key: 'userId'},
-      { header: 'Phone Number', key: 'phoneNumber'},
-      { header: 'Created At', key: 'createdAt'},
-      { header: 'Updated At', key: 'updatedAt'},
-    ];
+    const cursor = client.query(
+      new Cursor(`
+        SELECT id, "userId", "phoneNumber", "createdAt", "updatedAt"
+        FROM "Customer"
+      `)
+    );
 
-    let client: PoolClient | undefined;
+    const batchSize = 1000;
 
-    try {
-      client = await this.pool.connect();
+    const read = () => {
+      cursor.read(batchSize, (err, rows) => {
+        if (err) {
+          client.release();
+          res.end();
+          return;
+        }
 
-      const query = new QueryStream(
-        'SELECT id, "userId", "phoneNumber", "createdAt", "updatedAt" FROM "Customer"',
-        [],
-        { batchSize: 5000 }
-      );
+        if (!rows.length) {
+          cursor.close(() => client.release());
+          csv.end();
+          return;
+        }
 
-      const stream = client.query(query);
+        for (const row of rows) {
+          csv.write(row);
+        }
 
-      for await (const row of stream) {
-        worksheet.addRow({
-          id: row.id,
-          userId: row.userId,
-          phoneNumber: row.phoneNumber,
-          createdAt: row.createdAt,
-          updatedAt: row.updatedAt,
-        }).commit();
-      }
+        read();
+      });
+    };
 
-      await worksheet.commit();
-      await workbook.commit();
-    } catch (error) {
-      console.error('Export failed:', error);
-
-      if (!res.headersSent) {
-        res.status(500).send('Export failed');
-      }
-    } finally {
-      if (client) client.release();
-    }
-  }
-
-  onModuleDestroy() {
-    this.pool.end();
+    read();
   }
 }

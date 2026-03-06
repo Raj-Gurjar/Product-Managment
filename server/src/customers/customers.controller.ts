@@ -7,15 +7,7 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Get('export')
-  async export(@Res() res: Response) {
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    );
-    res.setHeader(
-      'Content-Disposition',
-      'attachment; filename=' + 'customers.xlsx',
-    );
-    await this.customersService.exportToExcel(res);
+  exportCustomers(@Res() res: Response) {
+    return this.customersService.exportCSV(res);
   }
 }
